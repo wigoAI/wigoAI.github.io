@@ -9,7 +9,7 @@ exclude:
   - "/vendor/"
 
 # Site settings
-title: wIGO AiLab
+title: WIGO AiLab
 subtitle: "what is go on"
 email: lab@wigoai.com
 name: wigoai
