@@ -26,6 +26,10 @@ logo: "/assets/logo.png"
 
 # Build settings
 markdown: kramdown
+highlighter: rouge
+lsi: false
+excerpt_separator: "\n\n"
+incremental: false
 inter_post_navigation: false
 highlightjs_theme: "monokai-sublime"
 
