@@ -4,6 +4,8 @@ title: "Attention is All you need"
 tags: [Attention, Transformer]
 use_math: true
 comments: true
+author: indexxlim
+
 ---
 # Attension is All you need
 ### Abstract
