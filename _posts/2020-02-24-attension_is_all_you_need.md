@@ -129,12 +129,12 @@ $${PE}_{(pos,2i)}=sin⁡(pos/10000^{2i/d_{model}})
 그리고 위의 3가지 외에 또 다른 이유는 어탠션을 사용하면 모델 자체의 동작을 해석하기 쉬워진다는(interpretable) 장점 때문입니다. 어탠션 하나의 동작 뿐만 아니라 multi-head의 동작 또한 어떻게 동작하는지 이해하기 쉽다는 장점이 있습니다.
 <img src="/assets/8_transformer.png" itemprop="image">
 
-# 결론
+## 결론
 
 본 연구에서는, 전적으로 주의를 기반으로 한 최초의 시퀀스 전달 모델인 Transformer를 제시하여, 인코더-디코더 아키텍처에서 가장 일반적으로 사용되는 순환 레이어를  multi-headed self-attention로 대체하였습니다.  
 번역 작업의 경우, Transformer는 순환 또는 합성곱  레이어에 기반한 구조보다 훨씬 더 빠르게 훈련될 수 있습니다. WMT 2014 영어-독일어 및 WMT 2014 영어-프랑스어 번역 과제 모두에서 SOTA를 달성했습니다. 이전의 과제에서 우리의 최고의 모델이 이전에 보고된 모든 앙상블보다 더 성능이 좋습니다. 우리는 관심 기반 모델의 미래에 대해 흥분하고 있으며 다른 과제에 적용할 계획입니다. Transformer를 텍스트 이외의 입력 및 출력으로 확장하고 영상, 오디오, 비디오 등에서 대용량 입력과 출력을 효율적으로 처리하기 위한 국부적이고 제한된 어탠션 메커니즘을 조사할 계획입니다. 우리의 또 다른 연구 목표는 덜 순차적으로 발전하는 것입니다.
 
-#참조
+## Reference
 
 •[Transformer](https://arxiv.org/abs/1706.03762)  
 •[Attention](https://arxiv.org/abs/1409.0473)  
@@ -146,5 +146,3 @@ $${PE}_{(pos,2i)}=sin⁡(pos/10000^{2i/d_{model}})
 •[https://pozalabs.github.io/transformer/](https://pozalabs.github.io/transformer/)  
 •[http://freesearch.pe.kr/archives/4876#easy-footnote-bottom-2-4876](http://freesearch.pe.kr/archives/4876)  
 •[https://wikidocs.net/22893](https://wikidocs.net/22893)  
-
-Writer : 임지수(indexxlim@gmail.com)
