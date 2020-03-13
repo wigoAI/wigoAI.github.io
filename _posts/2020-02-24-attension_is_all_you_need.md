@@ -8,6 +8,15 @@ author: indexxlim
 
 ---
 # Attension is All you need
+
+2018년 BERT라는 모델이 등장하면서 state-of-the-art를 차지했습니다.
+이 BERT모델의 기반이 되는 Transformer를 설명 하려고 합니다.
+
+Transfomer는 어텐션 매커니즘을 사용하여 Encoder-Decoder로 구성됩니다.
+여기서 어텐션 매커니즘이란 단어의 위치정보를 이용하여 어떤 단어를 주목해야하는지를 학습합니다.
+그럼 논문을 보겠습니다.
+
+
 ### Abstract
 전반적인 시퀀스 전달 모델은 인코더와 디코더를 포함하는 복잡한 순환(recurrent) 또는 합성곱(convolution)을 기반으로 합니다. 최고의 성능의 모델들은 또한 어텐션 메커니즘 (attention mechanism) 을 통해 인코더와 디코더를 연결합니다. 우리는 새로운 단순한 네트워크 아키텍처인 트랜스포머를 오로지 어텐션 메커니즘에 기초하고, 순환과 합성곱을 완전히 배제하는 것을 제안합니다. 두 가지 기계 번역 작업에 대한 실험에서 이러한 모델은 보다 병렬적이고 상당히 필요한 동시에 품질이 우수하다는 것을 보여줍니다.
 <img src="/assets/1_transformer.png" itemprop="image">
@@ -79,7 +88,7 @@ Decoder
 디코더도 인코더와 마찬가지로 동일한 계층이 N개 반복되는 형태입니다. 그리고 디코더도  6번 반복합니다. 그러나 반복되는 계층이 인코더와는 다르게  총 3개의 하위 계층으로 구성되어 있는데, 2개는 기존의 인코더의 하위 계층과 동일하고 나머지 하나는 인코더의 출력에 대해 멀티헤드 어텐션을  계산하는 하위 계층이 추가되었습니다. 디코더에서도  RC가 사용되었는데, 잔차 값을 더한 후 동일하게 계층들을 레이어 정규화 해줍니다. 그리고 자가 어텐션을 인코더와는 약간 다르게 수정을 했는데, 마스킹(masking)을 추가했습니다. 자가 어텐션을 할 때 현재 위치보다 뒤에 있는 단어는 변하지 못하도록 마스킹을  추가해준 것입니다. 다른위치의 단어는 auto-regressive한 특성을 이용해 알고 있는 정보로만 계산합니다.
 
 ### Scaled Dot-Product Attention
-<img src="/assets/6_transformer.png" itemprop="image">
+<img src="/assets/6_transformer.png" itemprop="image"  width="100" height="300">
 
 해당 어텐션의 입력은 3가지입니다. D개  차원을 가지는 queries(Q)와 keys(K), values(V)로 구성됩니다. 먼저 Q는 주로 디코더의 은닉 상태 벡터, K는 인코더의 은닉 상태 벡터, V는 K에 정렬 모델(alignment model)로 계산된 어텐션 가중치입니다.
 
