@@ -24,13 +24,13 @@ classes: wide
 
 
 ## 1. Abstract
-전반적인 시퀀스 전달 모델은 인코더와 디코더를 포함하는 복잡한 순환(recurrent) 또는 합성곱(convolution)을 기반으로 합니다. 최고의 성능의 모델들은 또한 어텐션([attention]) 을 통해 인코더와 디코더를 연결합니다. 우리는 새로운 단순한 네트워크 아키텍처인 트랜스포머를 오로지 어텐션 메커니즘에 기초하고, 순환과 합성곱을 완전히 배제하는 것을 제안합니다. 두 가지 기계 번역 작업에 대한 실험에서 이러한 모델은 보다 병렬적이고 상당히 필요한 동시에 품질이 우수하다는 것을 보여줍니다.
+전반적인 시퀀스 전달 모델은 인코더와 디코더를 포함하는 복잡한 순환(recurrent) 또는 합성곱(convolution)을 기반으로 합니다. 최고의 성능의 모델들은 또한 어텐션([attention]) 을 통해 인코더와 디코더를 연결합니다. 우리는 새로운 단순한 네트워크 아키텍처인 트랜스포머를 오로지 `어텐션 메커니즘`에 기초하고, 순환과 합성곱을 완전히 배제하는 것을 제안합니다. 두 가지 기계 번역 작업에 대한 실험에서 이러한 모델은 보다 병렬적이고 상당히 필요한 동시에 품질이 우수하다는 것을 보여줍니다.
 <img src="/assets/1_transformer.png" itemprop="image">
 ## 2. Introduction
 ### Recurrent
 연속전인 데이터를 처리하기 위해 이전까지 많이 쓰이던 모델은 순환(recurrent) 모델이었습니다. 순환 모델은 ht  번째에 대한 출력을 만들기 위해, t번째 입력과 ht-1번째 은닉 상태(hidden state)를 이용했습니다. 이를 이용해  데이터의 순차적인 특성을 모델에 유지시켜 왔습니다.
 
-하지만 순환 모델의 경우 long-term dependency를 처리하는데 한계가 있습니다. Vanish gradient 문제는 LSTM과 GRU에서 어느 정도 해결해왔지만, 고정된 크기의 벡터에는 데이터의 특성을 고려하여 모든 정보를 압축할 수 없기 때문에 완전히 해결될 수 없었습니다. 예를 들어, “저는 언어학을 좋아하고, 인공지능 중에서도 딥러닝을 배우고 있고 자연어 처리에 관심이 많습니다.”라는 문장에서 ‘자연어’라는 단어를 만드는데 ‘언어학’이라는 단어는 중요한 단서입니다. 그러나, 두 단어 사이의 거리가 가깝지 않으므로 모델은 앞의 ‘언어학’이라는 단어를 이용해 자연어’라는 단어를 만들지 못하고, 언어학 보다 가까운 단어인 ‘딥러닝’을 보고 ‘이미지’를 만들 수도 있습니다. 이처럼, 어떤 정보와 다른 정보 사이의 거리가 멀 때 해당 정보를 이용하지 못하는 것이 long-term dependency problem입니다.
+하지만 순환 모델의 경우 `long-term dependency`를 처리하는데 한계가 있습니다. Vanish gradient 문제는 LSTM과 GRU에서 어느 정도 해결해왔지만, 고정된 크기의 벡터에는 데이터의 특성을 고려하여 모든 정보를 압축할 수 없기 때문에 완전히 해결될 수 없었습니다. 예를 들어, “저는 언어학을 좋아하고, 인공지능 중에서도 딥러닝을 배우고 있고 자연어 처리에 관심이 많습니다.”라는 문장에서 ‘자연어’라는 단어를 만드는데 ‘언어학’이라는 단어는 중요한 단서입니다. 그러나, 두 단어 사이의 거리가 가깝지 않으므로 모델은 앞의 ‘언어학’이라는 단어를 이용해 자연어’라는 단어를 만들지 못하고, 언어학 보다 가까운 단어인 ‘딥러닝’을 보고 ‘이미지’를 만들 수도 있습니다. 이처럼, 어떤 정보와 다른 정보 사이의 거리가 멀 때 해당 정보를 이용하지 못하는 것이 long-term dependency problem입니다.
 
 Recurrent model은 순차적인 특성이 유지되는 뛰어난 장점이 있었음에도, long-term dependency problem이라는 단점을 가지고 있습니다. 이와 달리 transformer는 순환이나 합성곱을 사용하지 않고 전적으로 어텐션 메커니즘만을 사용해 입력과 출력의 표현상태(representations)를 포착해냈습니다.
 <img src="/assets/2_transformer.png" itemprop="image" width="80%">
@@ -57,7 +57,7 @@ $$score(s_t, h_i )= s_t^T h_i
 \\a^t=softmax(e^t)
 \\c_t = \sum_{i=1}^{N}a_i^t  h_i$$
 
-원 논문에서는 t를 현재시점이라고 할 때, 인코더 출력벡터(s)와 은닉 상태 벡터(h)를 내적한 후에 소프트맥스(softmax)를 한다면 이를 어텐션 분포(attention distribution), 각각의 값을 어텐션 가중치(attention weight)라고 합니다. 이 가중치를 모두 더한다면 최종 출력 어텐션 값(attention value)이자 문맥 벡터(context vector)라고 정의 합니다. 그 후 실제 예측을 위해 어텐션 벡터와 인코더 출력벡터를 결합(concatenate)시켜 예측합니다.
+원 논문에서는 t를 현재시점이라고 할 때, 인코더 출력벡터(s)와 은닉 상태 벡터(h)를 내적한 후에 소프트맥스(softmax)를 한다면 이를 어텐션 분포(attention distribution), 각각의 값을 어텐션 가중치(attention weight)라고 합니다. 이 가중치를 모두 더한다면 최종 출력 어텐션 값(attention value)이자 `문맥 벡터(context vector)`라고 정의 합니다. 그 후 실제 예측을 위해 어텐션 벡터와 인코더 출력벡터를 결합(concatenate)시켜 예측합니다.
 
 ## 2. Introduction  –  RC, LN
 ### RC([Residual Connection])
@@ -73,11 +73,11 @@ $x_{(l+1)}=x_l+F(x_l,W_l )$ 이고
 $$x_L=x_l+\sum\limits^{L-1}_{i=1}F(x_i,W_i)$$
 이 식을 미분하면 $\frac{∂ε}{∂x_l}=\frac{∂ε}{∂x_L} \frac{∂x_L}{∂x_l}  = \frac{∂ε}{∂x_L}  (1+\frac{∂}{∂x_l} \sum\limits^{L-1}_{i=1}  F(x_i,W_i))$
 
-여기서 $\frac{∂ε}{∂x_L}$ 는 모든 레이어에 적용 되고,  F가 0이 되는 경우는 희박하기 때문에 가중치 $ε$ 가 매우 작더라도 vanishing gradient되는 경우는 거의 없습니다.
+여기서 $\frac{∂ε}{∂x_L}$ 는 모든 레이어에 적용 되고,  F가 0이 되는 경우는 희박하기 때문에 가중치 $ε$ 가 매우 작더라도 `Vanishing Gradient`되는 경우는 거의 없습니다.
 
 ### LN([Layer Normalization])
 
-각 레이어의 출력을 평균과 표준편차를 이용해서 표준화(standardization)합니다.
+각 레이어의 출력을 평균과 표준편차를 이용해서 `표준화(standardization)`합니다.
 
 
 
@@ -121,7 +121,7 @@ Query, key, value 들에 각각 다른 학습된 선형  투영(linear projectio
 $$MultiHead(Q,K,V)=Concat(head_1,…,head_h)W^o
 \\ where head_i=Attention(QW_i^Q,KW_i^K,VW_i^V)  $$
 
-어텐션  레이어가  h개 씩으로 나눠짐에 따라 모델은 여러 개의 표현 공간(representation subspaces)들을 가지게 해줍니다. Query, key, value weight 행렬들은 학습이 된 후 각각의 입력벡터들에게 곱해져 벡터들을단어의 정보에 맞추어 투영시키게 됩니다.
+어텐션  레이어가  h개 씩으로 나눠짐에 따라 모델은 여러 개의 표현 공간(representation subspaces)들을 가지게 해줍니다. Query, key, Value weight 행렬들은 학습이 된 후 각각의 입력벡터들에게 곱해져 벡터들을단어의 정보에 맞추어 투영시키게 됩니다.
 <img src="/assets/7_3_transformer.png" itemprop="image">
 
 ###  Position-wise Feed-Forward Networks
