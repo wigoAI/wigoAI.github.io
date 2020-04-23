@@ -19,7 +19,7 @@ classes: wide
 출력은 문서에서 가중치 높은 키워드들의 합이 높은 문장을 뽑습니다.  
 Input document → sentences similarity → weight sentences → select sentences with a higher rank.  
 그러나 이 때 가중치 높은 키워드들을 어떻게 찾을것이냐에 대한 여러가지의 방법들이 있습니다.  
-이 방법들을 먼저 나누어 보겠습니다.  
+이 방법들을 먼저 분류해보자면
 
 1. 단일문서과 다중문서  
 ```summary = summarize(document) 과 summary = summarize(document_1, document_2, …) ```  
@@ -32,6 +32,8 @@ Input document → sentences similarity → weight sentences → select sentence
 `특정 종류의 메타데이터를 바탕으로 한 요약, 문서의 전체정보를 통한 요약`  
   
 그 외에 업데이트요약, 키워드요약, 헤드라인요약, 감성기반, 다중언어요약 등이 있습니다.  
+
+이런 여러가지 분류중 몇가지 방법론들을 소개해보겠습니다.
 
 
 ## Graph Base
