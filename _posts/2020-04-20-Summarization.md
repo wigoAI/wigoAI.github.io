@@ -75,15 +75,17 @@ Ted Dunning은 log-likelihood를 사용하여 [topic signature]를 측정합니�
 첫번째로 문장 표현을 벡터화하는 것과, 두번째로 벡터화한 문장을 고르는 것입니다.
 이 문장표현과 문장을 따로따로 학습하거나 학습되있는 벡터를 가져와 맵핑하거나 군집화 할 수 있습니다.
 
-
-다음에는 SumBasic라는 단순히 단어의 등장확률을 통한 요약부터 TextRank, LexRank, 그리고 KL Summarizer 등을 직접 비교해보고,  
+#### -------------------------------------------------------------------------------  
+다음에는 [SumBasic]라는 단순히 단어의 등장확률을 통한 요약부터 TextRank, LexRank, 그리고 KL Summarizer 등을 직접 비교해보고,  
 단어의 등장확률이나 조건부확률, 단어의 극성등을 포함한 특징을 기반으로 한 지도학습으로 단어의 점수를 측정하고 이 단어들로 중요문장을 찾아보겠습니다.
 
 
 
-•[Text Summarization with Python]
+•[Text Summarization with Python]  
+•[Towards Automatic Text Summarization: Extractive Methods]
 
-[Text Summarization with Python]: https://medium.com/@umerfarooq_26378/R-summarization-in-python-76c0a41f0dc4
+
+
 [Hans Peter Luhn]: http://altaplana.com/ibm-luhn58-BusinessIntelligence.pdf
 [Edmundson Summarizer]: http://courses.ischool.berkeley.edu/i256/f06/papers/edmonson69.pdf
 [topic signature]: https://www.aclweb.org/anthology/J93-1003.pdf
