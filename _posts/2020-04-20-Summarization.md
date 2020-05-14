@@ -8,18 +8,8 @@ author: indexxlim
 classes: wide
 
 ---
-# Extractive Summarization
-요약에 대한 방법론중에서 가장 큰 분류는 현재 추출요약과 생성요약이 있습니다.  
-일관성있는 문구와 접사를 자연스럽게 생성하는 모델이 필수적이기 때문에 어려운 **생성요약** 대신,  
-유연성은 부족하지만 입력에서 들어온 문서에서 구문들을 추출하여 중요문장을 찾는 **추출요약**을 판단해 보고 사용해보겠습니다.  
-
-
-# What is Summarization
-여기서 말하는 요약은 일종의 함수로써, 문서가 들어왔을 때 출력으로 나가는 결과를 말합니다.  
-출력은 문서에서 가중치 높은 키워드들의 합이 높은 문장을 뽑습니다.  
-Input document → sentences similarity → weight sentences → select sentences with a higher rank.  
-그러나 이 때 가중치 높은 키워드들을 어떻게 찾을것이냐에 대한 여러가지의 방법들이 있습니다.  
-이 방법들을 먼저 분류해보자면
+요약에 대한 방법들은 다양하게 발전되어 왔습니다.
+먼저 몇몇 구분방법에 대야 나열하자면 다음과 같습니다. 
 
 1. 단일문서과 다중문서  
 ```summary = summarize(document) 과 summary = summarize(document_1, document_2, …) ```  
@@ -33,7 +23,18 @@ Input document → sentences similarity → weight sentences → select sentence
   
 그 외에 업데이트요약, 키워드요약, 헤드라인요약, 감성기반, 다중언어요약 등이 있습니다.  
 
-이런 여러가지 분류중 몇가지 방법론들을 소개해보겠습니다.
+# Summarization
+요약에 대한 방법론중에서, 가장 대표적이라고 할 수 있는, 큰 분류는 현재 추출요약과 생성요약이 있습니다.  
+일관성있는 문구와 접사를 자연스럽게 생성하는 모델이 필수적이기 때문에 어려운 **생성요약** 대신,  
+유연성은 부족하지만 입력에서 들어온 문서에서 구문들을 추출하여 중요문장을 찾는 **추출요약**을 판단해 보고 사용해보겠습니다.  
+
+
+# What is Extractive Summarization
+추출 요약은 일반적으로 원본 문서에서 가장 중요하다고 생각되는 문장을 선택하는 것으로 접근하고 있습니다.
+이 때 원본 문서에서 어떻게 가장 중요한 문장인지 판단하는 방법은, 단어에 대한 가중치를 합하여 가장 높은 점수를 가진 문자을 선택합니다.
+Input document → sentences similarity → weight sentences → select sentences with a higher rank.  
+여기서 다시 어떻게 단어에 대한 가중치를 판단할 것이냐에 따라 다양한 방법론들이 있습니다.
+그 중 몇가지를 소개해보겠습니다.
 
 
 ## Graph Base
