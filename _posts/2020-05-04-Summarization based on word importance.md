@@ -66,10 +66,10 @@ L(c1)과 L(c2)는 원본과 요약데이터에서 단어가 발생할 확률인�
 
 ### KL-divergence Feature
 KL은 확률분포 P와 Q사이의 차이를 계산합니다.  
-P는 joint probability(log-likelihood)로, Σpi = 1.0이고 Q는 (y1 : q1, ...., P는 (x1 : p1, x2 : p2, ..., xn : pn) 일 때, Σqj = 1.0 인 yn : qn).  
+P는 **joint probability(log-likelihood)**로, Σpi = 1.0이고 Q는 (y1 : q1, ...., P는 (x1 : p1, x2 : p2, ..., xn : pn) 일 때, Σqj = 1.0 인 yn : qn).  
 이제 P와 Q가 동일한 결과 xi에 대해 정의되었다고 가정합니다
 
-이렇게 요약문과 원본 데이터의 joint probability로 각 단어의 분포를 계산합니다.
+이렇게 요약문과 원본 데이터의 joint probability로 **각 단어의 분포**를 계산합니다.
 
 KL (P, Q) = Σ i = 1..n \[p i * log (p i / q i )]
 
@@ -95,7 +95,7 @@ KL (P, Q) = Σ i = 1..n \[p i * log (p i / q i )]
 <img src="/assets/summarization2/regression_result.png" itemprop="image" width="80%">
 6개의 특징을 가지고 regression 돌린 결과입니다.
 
-사진의 결과를 통해 1,3,5번째의 특징에서  p-value > 0.005 이므로 이 특징을 빼고 돌려보면
+사진의 결과를 통해 1,3,5번째의 특징에서  **p-value > 0.005** 이므로 이 특징을 빼고 돌려보면
 
 <img src="/assets/summarization2/regression_result2.png" itemprop="image" width="80%">
 비교적 p_value가 깨끗하게 나옵니다.
@@ -113,15 +113,16 @@ Rouge-N 은 문서 요약 분야에서 자주 이용되는 성능 평가 척도�
 
 
 6개의 특징을 사용했을때보다   
-sumr_1 :  0.45541628200940715
-sumr_2 :  0.13593530958811012
-sumr_l :  0.3443128264616987
+sumr_1 :  0.45541628200940715  
+sumr_2 :  0.13593530958811012  
+sumr_l :  0.3443128264616987  
 
-p_value가 0.005보다 큰 3개의 특징을 제외했을 때, 아주 미세하게 더 좋은 결과를 보여줌으로써 이 특징이 결과에 필요하지 않다는 것을 증명합니다.
-sumr_1 :  0.4558262102595408
-sumr_2 :  0.13621171053854797
-sumr_l :  0.3446573043118606
-
+p_value가 0.005보다 큰 3개의 특징을 제외했을 때, 아주 미세하게 더 좋은 결과를 보여줌으로써 이 특징이 결과에 필요하지 않다는 것을 증명합니다.  
+```
+sumr_1 :  0.4558262102595408  
+sumr_2 :  0.13621171053854797  
+sumr_l :  0.3446573043118606  
+```
 
 Lexrank Rouge점수와 비교해보면  
 sumr_1 :  0.43921486912181934  
