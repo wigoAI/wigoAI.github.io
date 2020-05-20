@@ -9,7 +9,7 @@ classes: wide
 
 ---
 요약에 대한 방법들은 다양하게 발전되어 왔습니다.
-먼저 몇몇 구분방법에 대야 나열하자면 다음과 같습니다. 
+먼저 몇몇 구분방법에 대하여 나열하자면 다음과 같습니다. 
 
 1. 단일문서과 다중문서  
 ```summary = summarize(document) 과 summary = summarize(document_1, document_2, …) ```  
@@ -31,7 +31,7 @@ classes: wide
 
 # What is Extractive Summarization
 추출 요약은 일반적으로 원본 문서에서 가장 중요하다고 생각되는 문장을 선택하는 것으로 접근하고 있습니다.
-이 때 원본 문서에서 어떻게 가장 중요한 문장인지 판단하는 방법은, 단어에 대한 가중치를 합하여 가장 높은 점수를 가진 문자을 선택합니다.
+이 때 원본 문서에서 어떻게 가장 중요한 문장인지 판단하는 방법은, 단어에 대한 가중치를 합하여 가장 높은 점수를 가진 문장을 선택합니다.  
 Input document → sentences similarity → weight sentences → select sentences with a higher rank.  
 여기서 다시 어떻게 단어에 대한 가중치를 판단할 것이냐에 따라 다양한 방법론들이 있습니다.
 그 중 몇가지를 소개해보겠습니다.
