@@ -30,24 +30,49 @@ Bert Base와 GPT-2 Base 모델들의 파라미터 갯수는 대략 110milion이�
 그래서 신경망과, 언어모델, 그리고 임베딩까지, ELMo의 구성요소를 알아보겠습니다.
 
 
-## LM
+## 1. LM
+
 ELMo는 LM에 기반하여 학습을 진행합니다.  
 통계학적으로 Language Model(LM)이란 일종의 확률분포(pobability distribution)입니다. 언어모델은 단어가 m개가 주어졌을때 각 단어의 확률 P(w1 ... wm)을 가지고 있습니다.
-만약 하나의 단어가 아니라 n-gram개의 단어 혹은 문장의 확률을 계산한다면 마르코프 체인 법칙(Markov chain rule)을 통해 계산 할 수 있습니다. 
+언어모델은 대다수의 자연어의 모델에 사용되는데, 이미지가 어떤 필터(filter)가 포함되어 있는지를 특징으로 학습한다면, 자연어는 각 단어의 확률분포로부터 단어 조합의 확률분포를 학습한다고 의의를 둘 수 있습니다.
+n-gram개의 단어로 이루어진 문장의 확률을 계산한다면 마르코프 체인 법칙(Markov chain rule)을 통해 계산 할 수 있습니다. 
 이 최대 우도 추정(maximum likelihood estimation) 수학적인 도출은 ∏i=1nP(wi) 
 
-[N-gram models]은 Smoothing 이나 Adjusting count로 변형 될수도 있습니다.
-MLE unigram probabilities 은 다음과 같습니다. P(wx) = count(wx) / N  이때 N은 ∑w count(w)라고 할 수 있습니다.
-Smoothed unigram probabilities  P(wx) = count(wx) / ( N+V )
-Adjusted counts (unigrams)      ci* = (ci+1) N / (N+V)
+[N-gram models]은 Smoothing 이나 Adjusting count로 변형 될수도 있습니다.  
+MLE unigram probabilities 은 다음과 같을 때,   $P(wx) = count(wx) \over N$  
+$N$은 $∑w count(w)$이고 $V$는 $vocab size$ 라고 했을 때, Add-one smoothing은 다음과 같은 절차를 지납니다.  
+Smoothed unigram probabilities  $P(w_x) = count(w_x) \over (N+V)$  
+Adjusted counts (unigrams)      $c_i^* = (c_i+1) {N \over (N+V)}$  
+MLE bigram probabilities $P(w_n\|w_{n-1}) = {count(w_{n-1}w_n ) \over count(w_{n-1})}$  
+Laplacian bigram probabilities $P(w_n\|w_{n-1}) = {count(w_{n-1}w_n )+1 \over count(w_{n-1})+V}$
 
-MLE bigram probabilities P(wn | wn!1) = count(wn!1wn ) / count(wn!1)
-Laplacian bigram probabilities P(wn | wn!1) = count(wn!1wn )+1 / count(wn!1)+V
+ 
+직접적으로 Add-one smoothed bigram probabilites을 살펴보면 다음과 같은 테이블이 나옵니다.
+
+<img src="/assets/elmo/original_count.png" itemprop="image" width="100%"> | <img src="/assets/elmo/new_count.png" itemprop="image" width="100%"> |
+
+<img src="/assets/elmo/original_probabilites.png" itemprop="image" width="100%"> | <img src="/assets/elmo/new_probabilites.png" itemprop="image" width="100%">
+
+즉 주어진 문장이 N개의 token으로 이루어져 있을때, $(t_1,t_2,...t_N)$ forward language model은 $(t_1,t_2,...,t_k)$에 대해 $t_k$의 확률을 모델링함으로써 문장의 확률을 구합니다.
+$p(t_1,t_2,...t_N)=∑k=1Np(t_k\|t_1,t_2,...,t_{k−1})$
+
+최근 좋은 성능을 보여주는 언어 모델들은 Bi-LSTM을 통해 문맥과는 독립적인 token 표현 xLMk을 만들어낸다. 그후 forward LSTM을 통해 L개의 layer를 통과시킨다. 각 token의 위치 k에서, 각 LSTM layer는 문맥에 의존되는 표현 $h→LMk,L$을 생성시킨다. 이 때,  $j=1,...,L$이다. LSTM layer의 가장 최상위층 output인 $h→LMk,L$은 softmax layer를 통해 다음 토큰인 $t_k+1$을 예측하는 데에 사용한다.
+
+backward LM 역시 forward LM과 비슷한데, 그 차이점은 문자열을 거꾸로 돌려 작동한다는 점에 있다. 즉 현재 token보다 미래에 나오는 token들을 통해 이전 token들을 예측하는 메커니즘이다.
+
+$p(t_1,t_2,...,t_N)=∑k=1Np(t_k\|t_{k+1},t_{k+2},...,t_N)$
 
 
+이것은 또한 주어진 $(t_{k+1},...,t_N)$에 대하여 $t_k$의 표현인 $h←LMk,j$를 예측한다.
+
+BiLM은 forward LM과 backward LM을 모두 결합한다. 다음의 식은 정방향 / 역방향의 log likelihood function을 최대화시킨다:
+
+$∑k=1N(logp(t_k\|t_1,...,t_{k−1};θx,θ→LSTM,θs)+logp(t_k|t_{k+1},...,t_N;θx,θ←LSTM,θs))$
 
 
-## 1. Abstract and Introduction
+여기서 token 표현 θx와 softmax layer θs의 파라미터를 묶었으며, 각 방향의 LSTM의 파라미터들은 분리시킨 채로 유지하였다. 여기서 이전 연구들과 다른 점은 파라미터들을 완전히 분리하는 것 대신에 방향 사이에 일정 weight를 공유하도록 하였다.
+
+## 2. ELMo
 
 "deep contextualized" 의 새로운 타입을 소개한다.  
 ELMo는 (1) 단어 사용의 복잡한 특성(Syntatic and Semantic, 구문과 의미론)을 모두 내포하며 (2) 이러한 용도가 언어적 맥락(다의어나 동음이의어)에 따라 어떻게 달라지는지 표현(word representation) 할수 있는 사전학습(pre-training) 모델이다. 단어 벡터는 대형 텍스트 말뭉치를 통해 양방향 언어 모델(biLM)로 내부적으로 학습했다. 이러한 벡터들이 기존 모델들에 쉽게 추가될 수 있고 질문 답변, 문자 첨부, 감정 분석 등 6가지 NLP 문제에서 개선할 수 있었다.   
@@ -56,30 +81,9 @@ ELMo의 representations은 전체 입력문장을 사용하고, 양방향 LSTM�
 higher-level LSTM : 문맥을 반영한 단어의 의미를 잘 표현함  
 lower-level LSTM : 단어의 문법적인 측면을 잘 표현함  
 
-## 2. Model Architecture  
-
-### Bidirectional language models
-
-주어진 문장이 N개의 token으로 이루어져 있을때, (t1,t2,...tN) forward language model은 (t1,t2,...,tk)에 대해 tk의 확률을 모델링함으로써 문장의 확률을 구한다.
-p(t1,t2,...tN)=∑k=1Np(tk|t1,t2,...,tk−1)
-
-최근 좋은 성능을 보여주는 언어 모델들은 Bi-LSTM을 통해 문맥과는 독립적인 token 표현 xLMk을 만들어낸다. 그후 forward LSTM을 통해 L개의 layer를 통과시킨다. 각 token의 위치 k에서, 각 LSTM layer는 문맥에 의존되는 표현 h→LMk,L을 생성시킨다. 이 때, j=1,...,L이다. LSTM layer의 가장 최상위층 output인 h→LMk,L은 softmax layer를 통해 다음 토큰인 tk+1을 예측하는 데에 사용한다.
-
-backward LM 역시 forward LM과 비슷한데, 그 차이점은 문자열을 거꾸로 돌려 작동한다는 점에 있다. 즉 현재 token보다 미래에 나오는 token들을 통해 이전 token들을 예측하는 메커니즘이다.
-
-p(t1,t2,...,tN)=∑k=1Np(tk|tk+1,tk+2,...,tN)
 
 
-이것은 또한 주어진 (tk+1,...,tN)에 대하여 tk의 표현인 h←LMk,j를 예측한다.
-
-BiLM은 forward LM과 backward LM을 모두 결합한다. 다음의 식은 정방향 / 역방향의 log likelihood function을 최대화시킨다:
-
-∑k=1N(logp(tk|t1,...,tk−1;θx,θ→LSTM,θs)+logp(tk|tk+1,...,tN;θx,θ←LSTM,θs))
-
-
-여기서 token 표현 θx와 softmax layer θs의 파라미터를 묶었으며, 각 방향의 LSTM의 파라미터들은 분리시킨 채로 유지하였다. 여기서 이전 연구들과 다른 점은 파라미터들을 완전히 분리하는 것 대신에 방향 사이에 일정 weight를 공유하도록 하였다.
-
-2) ELMo
+#### Bidirectional language models
 
 ELMo는 biLM에서 등장하는 중간 매체 layer의 표현들을 특별하게 합친 것을 의미한다. 각 토큰 tk에 대하여, L개의 layer인 BiLM은 2L+1개의 표현을 계산한다.
 
