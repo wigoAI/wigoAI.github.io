@@ -60,7 +60,7 @@ Simple linear interpolation  $P(w_n\|w_{n−2}w_{n−1}) = λ_3P(wn\|w_{n−2}w_
 
   
 
-### Newral Network Laguage Model(NNLM, Embedding)
+### -Newral Network Laguage Model(NNLM, Embedding)
 
 그 이후 통계적 언어 모델은 Newral Network Laguage Model(NNLM)이라는 신경망 언어모델로 발전하였습니다.
 이는 단어 간 유사도를 반영한 벡터를 만드는 **워드 임베딩(word embedding)**으로 다양한 알고리즘으로 발전하였습니다.  
@@ -71,14 +71,14 @@ Simple linear interpolation  $P(w_n\|w_{n−2}w_{n−1}) = λ_3P(wn\|w_{n−2}w_
 one-hot vector는 너무 넓게 분포가 되어있기 때문에**(희소 행렬, sparse matrix)**, lookup table이라는 단어의 벡터를 합치는 과정과 
 선형 층(linear layer)를 거쳐, 신경망(nonlinear)과 소프트맥스(softmax)를 통해 단어가 등장할 확률을 학습합니다.
 이중 선형 층은 활성화 함수(activation function)을 적용하지 않고 그대로 출력으로 나가는 층을 가르킵니다.([function])
-Word2Vec 등의 임베딩들은 이렇게 희소 표현을 분산 표현(distributed representation)으로 표현하면서, 중심단어 혹은 주변단어의 등장 확률을 통해 각 단어의 벡터를 학습해 나가게 됩니다.
+Word2Vec 등의 임베딩들은 이렇게 희소 표현을 **분산 표현(distributed representation)**으로 표현하면서, 중심단어 혹은 주변단어의 등장 확률을 통해 각 단어의 벡터를 학습해 나가게 됩니다.
 그 후 임베딩은 동시등장단어를 계산(GloVe)하고, charactor-level로 단어를 쪼개고(FastText), attention을 붙이는 등의 워드 임베딩이 등장하고 있습니다.
 
 <img src="/assets/elmo/embedding_vector.png" itemprop="image" width="100%">
 
 이렇게 각 단어가 n-gram 안에 동시등장할 확률을 학습한 
 
-### Perplexity
+### -Perplexity
 
 퍼플렉시티(perplexity, PPL)은 언어 모델의 성능을 측정하기 위한 정량 평가(explicit evalutation) 중 하나입니다.   
 $PPL(w_1, w_2, w_3, ... ,w_n) = P(w_1, w_2, w_3, ... ,w_n)^{-1\over {n}} = \sqrt[n]{1 \over {P(w_1, w_2, w_3, ... ,w_n)}} = = \sqrt[n]{1 \over {∏\limits_{i=1}^{n}P(w_1, w_2, w_3, ... ,w_n)}}$  
@@ -96,16 +96,17 @@ ELMo의 representations은 전체 입력문장을 사용하고, 양방향 LSTM�
 higher-level LSTM : 문맥을 반영한 단어의 의미를 잘 표현함  
 lower-level LSTM : 단어의 문법적인 측면을 잘 표현함  
 
+
 한줄로 표현하면 문맥에 따라 단어의 의미를 다르게 파악한다는 것입니다. 따라서 동일한 단어가 항상 동일한 벡터로 변환되지 않고 다른 벡터로 변환될 수도 있다고 이야기합니다.
 
 
-#### Bidirectional language models
+### -Bidirectional language models
 먼저 ELMO의 전체적인 구조는 다음과 같습니다.
 <img src="/assets/elmo/elmo_1.png" itemprop="image" width="60%">
 
 들어가기 앞서 표기를 정리하면
 
-|---
+
 | 표기 | 값 |
 |:------:|--------------------|
 |$task$ |하려는 작업
@@ -116,37 +117,42 @@ lower-level LSTM : 단어의 문법적인 측면을 잘 표현함
 |$h_{k,j}^{LM}$ | 모델의 j번째 레이어, k번째 단어에서 나온 hidden state.
 
 
-주어진 문장이 N개의 token으로 이루어져 있을때, forward language model은 $(t_1,t_2,...,t_k)$에 대해 $t_k$의 확률을 모델링함으로써 문장의 확률을 구합니다.  
+주어진 문장이 N개의 token으로 이루어져 있을때, language model은 에 대해 $t_k$의 확률을 모델링함으로써 문장의 확률을 구합니다.  
+**Bidirectional라는 이름 그대로 forward LSTM 과 backward LSTM 두 가지의 방향으로 구성**되어 있습니다.
 
-$$p(t_1,t_2,...t_N)=∑\limits_{k=1}^Np(t_k\|t_1,t_2,...,t_{k−1})$$
+
+$$p(t_1,t_2,...t_N)=∑\limits_{k=1}^Np(t_k|t_1,t_2,...,t_{k−1})$$
+
+$$p(t_1,t_2,...,t_N)=∑\limits_{k=1}^Np(t_k|t_{k+1},t_{k+2},...,t_N)$$
 
 최근 ~~논문이 나올 당시의~~ 언어 모델들은 Bi-LSTM을 통해 문맥과는 독립적인 token 표현 $x_k^{LM}$을 만들어냅니다.   
-그 후 forward LSTM을 통해 L개의 layer를 통과시킵니다.   
-각 token의 위치 k에서, 각 LSTM layer는 문맥에 의존되는 표현 $h_{k,L}^{LM}$을 생성시킵니다.  
-$j=1,...,L$ 일 때, LSTM layer의 가장 최상위층 output인 $h^{LM}_k,L$은 softmax layer를 통해 다음 토큰인 $t_k+1$을 예측하는 데에 사용합니다.
-
-
-backward LM 역시 forward LM과 비슷한데, 그 차이점은 문자열을 거꾸로 돌려 작동한다는 점에 있습니다. 즉 현재 token보다 미래에 나오는 token들을 통해 이전 token들을 예측하는 메커니즘입니다.
-
-$p(t_1,t_2,...,t_N)=∑\limits_{k=1}^Np(t_k\|t_{k+1},t_{k+2},...,t_N)$
-
-
-또한 주어진 $(t_{k+1},...,t_N)$에 대하여 $t_k$의 표현인 $h_{k,j}^{←LM}$를 예측합니다.
+여기서 두가지 수식의 차이점은 forward는 $(t_1,t_2,...,t_k)$ 즉 k번째 이전까지의 토큰을 사용한다는 것이고,  $(t_{k+1},...,t_N)$ backward는 k번째 이후의 토큰을 사용합니다.  
+그 후에는 LSTM을 통해 L개의 layer를 통과시켜 각 token의 위치 k에서, 각 LSTM layer는 문맥에 의존되는 표현 $h_{k,L}^{LM}$을 생성시킵니다.    
+LSTM layer의 가장 최상위층 output인 $h^{LM}_k,L$은 softmax layer를 통해 다음 토큰인 forward에서 $t_k+1$ 혹은 backward에서 $t_k-1$ 을 예측하는 데에 사용합니다.
 
 BiLM은 forward LM과 backward LM을 모두 결합한 형태인데, 다음의 식은 정방향 / 역방향의 log likelihood function을 최대화시킵니다  
 $∑\limits_{k=1}^N(logp(t_k\|t_1,...,t_{k−1};θx,θ→LSTM,θs)+logp(t_k|t_{k+1},...,t_N;θx,θ←LSTM,θs))$
 
-token 표현 θx와 softmax layer θs의 파라미터를 묶었으며, 각 방향의 LSTM의 파라미터들은 분리시킨 채로 유지하였습니다.  
-이전 연구들과 다른 점은 파라미터들을 완전히 분리하는 것 대신에 방향 사이에 일정 weight를 공유하도록 했습니다.
+token 표현 $θ_x$와 $softmax\ layer\ θ_s$의 파라미터를 묶었으며, 각 방향의 LSTM의 파라미터들은 분리시킨 채로 유지하였습니다.  
+저자의 이전 연구들과 다른 점은 파라미터들을 완전히 독립적으로 사용하기보다는 forward와 backward계산에 일정 weight를 공유하도록 했습니다.
+
+
+
+### -ELMo
+
+<img src="/assets/elmo/elmo_2.png" itemprop="image" width="100%">
+
 
 ELMo는 biLM에서 등장하는 중간 매체 layer의 표현들을 특별하게 합친 것을 의미하는데, 각 토큰 $t_k$에 대하여, L개의 layer인 BiLM은 2L+1개의 표현을 계산합니다.  
 
-$$R_k=(x_k^{LM},h_k^{→LM},j,h_k^{←LM},j\|j=1,...,L)$$
+$$R_k=(x_k^{LM},h_{k,j}^{→LM},h_{k,j}^{←LM}|j=1,...,L)$$
  
-$$R_k=(h_k^{LM},j\|j=0,...,L)$$
+$$R_k=(h_{k,j}^{LM}|j=0,...,L)$$
 
 이 때, $h_{k,0}^{LM}$은 token layer를 뜻하고, $h_{k,j}^{LM}=\[h_{k,j}^{→LM};h_{k,j}^{←LM}\]$ 는 biLSTM layer를 의미합니다. 그래서 모든 layer에 존재하는 representation을 R로 single vector로 혼합하는 과정을 거칩니다:
-$ELMo_{k}=E(R_k;θ_e)$
+
+$$ELMo_{k}=E(R_k;θ_e)$$
+
 예시로, 가장 간단한 ELMo 버전은 가장 높은 layer를 취하는 방법이 있습니다 : $E(R_k)=h_{k,L}^{LM}$.
 이 ELMo는 task에 맞게 또 변형될 수 있습니다.
 
@@ -154,36 +160,40 @@ $$
 ELMo_k^{task}=E(R_k;θ^{task})=γ^{task}∑\limits_{j=0}^{L}s_j^{task}h_{k,j}^{LM}
 $$
 
+<img src="/assets/elmo/weightedsum.png" itemprop="image" width="40%">
 
-$s^{task}$는 softmax-normalized weight를 의미하고 $γ^{task}$는 task model을 전체 ELMo vector의 크기를 조절하는 역할을 맡습니다.  
-그림으로 보면 
-<img src="/assets/elmo/elmo_2.png" itemprop="image" width="80%">
+**$s^{task}$는 softmax-normalized weight를 의미하고 $γ^{task}$는 regularization으로 task model을 전체 ELMo vector의 크기를 조절하는 역할을 맡습니다**.  
 
+## 3. 사용
 
-해당 그림과 같이 각 Bi-LSTM Layer들을 통해 나오는 hidden representation을 task의 비율에 맞추어 더해 ELMo vector를 만드는 것입니다.
+ELMo의 사용은 논문에 따르면 입력으로 CNN으로 1차적으로 학습되어진 값을 사용했다고 합니다. 128개의 필터로 학습되어진 16차원의 임베딩을 사용해서 돌렸습니다.
+그리하여 학습이 다 되었을때 Word2Vec이나 GloVe와 같이 입력이 되기도 합니다.
 
-즉 과정을 다시 정리해보면  
-(1) BiLSTM layer의 꼭대기층의 token이 softmax layer를 통해 다음 token을 예측하도록 훈련시킨다.  
-(2) 훈련된 BiLSTM layer에 input sentence를 넣고 각 layer의 representation 합을 가중치를 통해 합한다.  
-(3) input sentence length만큼 single vector가 생성된다.  
+<img src="/assets/elmo/elmorepresentation.png" itemprop="image" width="40%">
 
-3) Using biLMs for supervised NLP tasks  
-이렇게 pre-trained된 biLM과 NLP task를 위한 supervised architecture를 결합하여 task model의 성능을 향상시켰다. 이 때, 이 논문에서는 이 representation의 선형 결합을 다음과 같이 학습시켰다.
+즉 Elmo의 context vector와 코퍼스의 의미를 모두 포함한 vector와 병행되어 사용되는것으로 보입니다.
 
-(1) 먼저 biLM없이 supervised model의 가장 낮은 layer를 고려했다. 대부분의 supervised NLP model은 가장 낮은 층에서 공통적인 architecture를 공유한다. 따라서 이는 ELMo를 쉽게 붙일 수 있는 계기가 되었다. 주어진 sequence (t1,...tN)에 대해 pre-trained token representation인 xk를 사용했으며 때때로 문자 기반 representation을 사용하는 것이 NLP task의 대부분이였다. 이 때, bi-RNN이나 CNN, feed forward network를 통해 context에 의존적인 representation hk를 만드는 것이 NLP task에서 주로 하는 작업이였다.
+```
+import tensorflow_hub as hub
+elmo = hub.Module("https://tfhub.dev/google/elmo/1", trainable=True)
+```
 
-(2) 따라서 supervised model에 ELMo를 부착하기 위해 biLM의 가중치값을 고정시키고 ELMo vector인 ELMotaskk를 token representation xk와 결합시켜 다음과 같은 [xk;ELMotaskk] representation을 생성하였다. 이 representation은 context-sensitive representation hk를 만들기 위한 input으로 사용된다.
-
-(3) 마지막으로 ELMo에 dropout을 설정하는 것이 더 좋다는 것을 알았으며, 때때로 λ\|\|w\|\|22와 같은 regularization factor를 더하는 게 좋아 몇몇 케이스에서는 regularization을 생.성하였다.
-
-
+감사합니다!!
 
 ## Reference
+
+•[N-gram models]
+•[Statistical Parametric Speech Synthesis]
+•[Intrinsic evaluation]
+•[SVDL]
+•[wikidocs]
+•[function]
+•[The Illustrated BERT, ELMo, and co.]
 
 [N-gram models]: http://www.cs.cornell.edu/courses/cs4740/2014sp/lectures/smoothing+backoff.pdf
 [Statistical Parametric Speech Synthesis]: https://static.googleusercontent.com/media/research.google.com/ko//pubs/archive/44312.pdf
 [Intrinsic evaluation]: https://cs224d.stanford.edu/lecture_notes/notes2.pdf
 [SVDL]: http://blog.shakirm.com/wp-content/uploads/2015/07/SVDL.pdf
-[NNLM]: https://wikidocs.net/45609
+[wikidocs]: https://wikidocs.net
 [function]: http://neuralnetworksanddeeplearning.com/chap4.html
 [The Illustrated BERT, ELMo, and co.]: http://jalammar.github.io/illustrated-bert/
